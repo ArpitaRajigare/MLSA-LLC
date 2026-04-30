@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Book</title>
+
+<style>
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', sans-serif;
+
+        /* Library Background Image */
+        background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+        url('https://png.pngtree.com/thumb_back/fh260/background/20241026/pngtree-a-peaceful-library-scene-with-an-open-book-on-table-perfect-image_16458585.jpg');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        min-height: 100vh;
+        padding: 30px;
+    }
+
+    .container {
+        max-width: 850px;
+        margin: auto;
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(8px);
+        padding: 25px;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+
+        animation: fadeIn 1s ease;
+    }
+
+    @keyframes fadeIn{
+        from{
+            opacity:0;
+            transform:translateY(30px);
+        }
+        to{
+            opacity:1;
+            transform:translateY(0);
+        }
+    }
+
+    h1 {
+        text-align: center;
+        color: #0077b6;
+        margin-bottom: 20px;
+        font-size: 38px;
+    }
+
+    .subtitle{
+        text-align:center;
+        color:#555;
+        margin-bottom:25px;
+    }
+
+    input {
+        width: 100%;
+        padding: 14px;
+        margin: 10px 0;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        font-size:16px;
+        transition:0.3s;
+    }
+
+    input:focus{
+        border-color:#0077b6;
+        outline:none;
+        box-shadow:0 0 10px rgba(0,119,182,0.4);
+    }
+
+    button {
+        padding: 12px 18px;
+        border: none;
+        border-radius: 10px;
+        background: #0077b6;
+        color: white;
+        cursor: pointer;
+        margin-top: 10px;
+        font-size:15px;
+        transition:0.3s;
+    }
+
+    button:hover {
+        background: #023e8a;
+        transform:scale(1.05);
+    }
+
+    .search {
+        margin-top: 20px;
+    }
+
+    .contact-list {
+        margin-top: 25px;
+    }
+
+    .contact {
+        background: linear-gradient(135deg, #f1faff, #dff6ff);
+        padding: 18px;
+        border-radius: 15px;
+        margin-bottom: 15px;
+        position: relative;
+        box-shadow:0 5px 15px rgba(0,0,0,0.1);
+
+        animation: slideUp 0.5s ease;
+    }
+
+    @keyframes slideUp{
+        from{
+            opacity:0;
+            transform:translateY(20px);
+        }
+        to{
+            opacity:1;
+            transform:translateY(0);
+        }
+    }
+
+    .contact strong {
+        font-size: 22px;
+        color: #023e8a;
+    }
+
+    .contact small {
+        display: block;
+        color: #444;
+        margin-top:5px;
+        font-size:15px;
+    }
+
+    .actions {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+    }
+
+    .delete {
+        background: crimson;
+        padding: 8px 12px;
+        margin-left: 5px;
+    }
+
+    .delete:hover{
+        background:darkred;
+    }
+
+    .edit {
+        background: orange;
+        padding: 8px 12px;
+    }
+
+    .edit:hover{
+        background:#cc8400;
+    }
+
+    .footer{
+        text-align:center;
+        margin-top:20px;
+        color:#444;
+        font-size:14px;
+    }
+
+    @media(max-width:600px){
+
+        h1{
+            font-size:30px;
+        }
+
+        .actions{
+            position:static;
+            margin-top:10px;
+        }
+
+        .contact{
+            text-align:left;
+        }
+    }
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>📚 Smart Contact Book</h1>
+    <p class="subtitle">Organize your contacts like books in a digital library</p>
+
+    <input type="text" id="name" placeholder="Enter Name">
+    <input type="text" id="phone" placeholder="Enter Phone Number">
+    <input type="email" id="email" placeholder="Enter Email">
+
+    <button onclick="addContact()">➕ Add Contact</button>
+
+    <input type="text" id="search" class="search"
+    placeholder="🔍 Search contact..."
+    onkeyup="searchContact()">
+
+    <div class="contact-list" id="contactList"></div>
+
+    <div class="footer">
+        📖 Contact Book with Library Theme
+    </div>
+</div>
+
+<script>
+
+    let contacts = JSON.parse(localStorage.getItem("contacts")) || [];
+
+    function displayContacts(data = contacts) {
+
+        let list = document.getElementById("contactList");
+        list.innerHTML = "";
+
+        if(data.length === 0){
+            list.innerHTML = `
+                <div style="text-align:center;color:#555;padding:20px;">
+                    No contacts found 📭
+                </div>
+            `;
+            return;
+        }
+
+        data.forEach((c, index) => {
+
+            let div = document.createElement("div");
+            div.className = "contact";
+
+            div.innerHTML = `
+                <strong>👤 ${c.name}</strong>
+                <small>📞 ${c.phone}</small>
+                <small>📧 ${c.email}</small>
+
+                <div class="actions">
+                    <button class="edit"
+                    onclick="editContact(${index})">
+                    ✏ Edit
+                    </button>
+
+                    <button class="delete"
+                    onclick="deleteContact(${index})">
+                    ❌ Delete
+                    </button>
+                </div>
+            `;
+
+            list.appendChild(div);
+        });
+    }
+
+    function addContact() {
+
+        let name = document.getElementById("name").value.trim();
+        let phone = document.getElementById("phone").value.trim();
+        let email = document.getElementById("email").value.trim();
+
+        if (!name || !phone || !email) {
+            alert("Please fill all fields!");
+            return;
+        }
+
+        if(phone.length < 10){
+            alert("Enter valid phone number!");
+            return;
+        }
+
+        contacts.push({ name, phone, email });
+
+        localStorage.setItem("contacts",
+        JSON.stringify(contacts));
+
+        document.getElementById("name").value = "";
+        document.getElementById("phone").value = "";
+        document.getElementById("email").value = "";
+
+        displayContacts();
+
+        alert("Contact Added Successfully ✅");
+    }
+
+    function deleteContact(index) {
+
+        if(confirm("Delete this contact?")){
+
+            contacts.splice(index, 1);
+
+            localStorage.setItem("contacts",
+            JSON.stringify(contacts));
+
+            displayContacts();
+        }
+    }
+
+    function editContact(index) {
+
+        let c = contacts[index];
+
+        document.getElementById("name").value = c.name;
+        document.getElementById("phone").value = c.phone;
+        document.getElementById("email").value = c.email;
+
+        contacts.splice(index, 1);
+
+        localStorage.setItem("contacts",
+        JSON.stringify(contacts));
+
+        displayContacts();
+    }
+
+    function searchContact() {
+
+        let search = document.getElementById("search")
+        .value.toLowerCase();
+
+        let filtered = contacts.filter(c =>
+
+            c.name.toLowerCase().includes(search) ||
+
+            c.phone.includes(search) ||
+
+            c.email.toLowerCase().includes(search)
+        );
+
+        displayContacts(filtered);
+    }
+
+    displayContacts();
+
+</script>
+
+</body>
+</html>
